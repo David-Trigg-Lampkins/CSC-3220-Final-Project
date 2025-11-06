@@ -11,7 +11,7 @@
     6. Be sure to include a link to the competition/source in the Appendix.]
 
 
-## 2. Data and Exploratory Analysis (15%) 
+## 2. Data and Exploratory Analysis (15%) ~ Trey Owen
   - Crashes on SR-32 in Cocke County from State Route 73 to north of Wilton Springs Road over a period of 3 years with a total of 219 instances.
   - Delete rows with missing data
   - Create factors
