@@ -1,4 +1,4 @@
-library(tidyr, dplyr)
+library(tidyr, dplyr, VIM)
 
 df <- read.csv("raw_data.csv")
 
@@ -13,14 +13,14 @@ df$RELATIONTO <- gsub("INTERSECTION RELA(\\W|\\w)*", "INTERSECTION RELATED", df$
 df[df == "--"] <- NA
 
 # From Gemini
-df <- df |> mutate(across(c(RELATIONTO, TDOTLOC, TYPEOFCRAS, FIRSTHARMF, MANNEROFCO, WEATHER, LIGHTCONDI),
+df <- df |> dplyr::mutate(across(c(RELATIONTO, TDOTLOC, TYPEOFCRAS, FIRSTHARMF, MANNEROFCO, WEATHER, LIGHTCONDI),
                           as.factor))
 
 df$DATEOFCRAS <- as.Date(df$DATEOFCRAS, format = "%m/%d/%Y")
 
 
 # Drop unneeded columns (same value for all instances/useless data)
-df <- df |> select(-Shape..,
+df <- df |> dplyr::select(-Shape..,
                    -MSLINK, -RELATIONT2, -URBAN, -NBR_TENN_C,
                    -NBR_RT2, -SPCL_CSE, -CNTY_SEQ, -YEAROFCRAS,
                    -LOCATE_TYP, -Hour)
@@ -28,22 +28,21 @@ df <- df |> select(-Shape..,
 summary(df)
 
 # Hot-deck impute or randomly impute NAs
-# Recycles the sample sample, needs to be changed using the VIM library
+# Using VIM to hot-deck impute some features
 # Deletion was not used to prevent bias
 set.seed(123)
 
-randFirstHarm <- sample(na.omit(df$FIRSTHARMF), size = 1)
+# With the help of Mr. C
+df <- df |> rowwise() |> mutate(RELATIONTO = case_when(
+  is.na(RELATIONTO) & TDOTLOC == "At an Intersection" ~ sample(c("INTERSECTION RELATED", "INTERSECTION"), 1),
+  is.na(RELATIONTO) & TDOTLOC == "Along Roadway" ~ sample(na.omit(unique(df$RELATIONTO)), 1, replace = TRUE),
+  TRUE ~ as.character(RELATIONTO)
+)) |> ungroup() |> mutate(RELATIONTO = factor(RELATIONTO))
 
-randManner <- sample(na.omit(df$MANNEROFCO), size = 1)
-
-randWeather <- sample(na.omit(df$WEATHER), size = 1)
-
-randLight <- sample(na.omit(df$LIGHTCONDI), size = 1)
-
-df <- df |> replace_na(list(FIRSTHARMF = randFirstHarm, MANNEROFCO = randManner, WEATHER = randWeather, LIGHTCONDI = randLight))
+df <- df |> hotdeck(variable = c("FIRSTHARMF", "MANNEROFCO", "WEATHER", "LIGHTCONDI"), imp_var = FALSE)
 
 # Drop the TDOTLOC feature (duplicates values of RELATIONTO)
-df <- df |> select(-TDOTLOC)
+df <- df |> dplyr::select(-TDOTLOC)
 
 # Enrichment
 # Derive a new attribute crashSeverity from TYPEOFCRAS
