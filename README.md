@@ -76,3 +76,7 @@ There are other models that exist that seek to classify crash severity based on 
  
 
 Include the link to your github/gitlab repository (that I can access) containing your R programs/scripts, and link to the data/competition website. 
+
+Data Source: 
+https://www.tn.gov/content/dam/tn/tdot/infoonprojectsregion1/sr32/app/Appendix%20B%20Traffic%20Safety%20Data.pdf
+Data set used can be found on pages 58-60
