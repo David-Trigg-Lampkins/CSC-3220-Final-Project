@@ -10,6 +10,13 @@
     5. Included a brief summary of any related work you know about.
     6. Be sure to include a link to the competition/source in the Appendix.]
 
+The problem we aim to solve is predicting the serverity of a crash based on the light conditions, weather, time of day, and crash type of an incident to determine the amount of resources required to handle it.
+
+This data comes from the a Tennessee Department of Transportation report of Traffic Safety along State Route 73 in Cocke County, Tennessee. It measures the date and time, type of crash (ie. property damage, fatal, minor/major injury), the manner of crash (ie.sideswipe, head-on, rear-end, etc), amount of injuries, fatalities, and vehicles involved in each crash, and the conditions for lighting, weather, and time of day for each crash.
+
+This data is important for 911 dispatchers and first responders to be able to more accurately assess the level of severity of a crash, and the necessary measures that should be dispatched to take care of the crash. This is helpful in assuring that those in the crash have the level of care that they require, while not overusing first responder resources. 
+
+There are other models that exist that seek to classify crash severity based on preknown data. The other models have been used for a wide range of purposes, including predicting the needed dispatch measures for a crash, like our model, or for determiining needed changes to a roadway's layout or laws (ie. speed limits, traffic stops, etc.) to reduce crashes in a given area. These models are generally accurate predictors of the severity or frequency of crashes on a given roadway.
 
 ## 2. Data and Exploratory Analysis (15%) ~ Trey Owen
   - Crashes on SR-32 in Cocke County from State Route 73 to north of Wilton Springs Road over a period of 3 years with a total of 219 instances.
