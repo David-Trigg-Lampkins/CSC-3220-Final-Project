@@ -13,14 +13,14 @@ df$RELATIONTO <- gsub("INTERSECTION RELA(\\W|\\w)*", "INTERSECTION RELATED", df$
 df[df == "--"] <- NA
 
 # From Gemini
-df <- df |> dplyr::mutate(across(c(RELATIONTO, TDOTLOC, TYPEOFCRAS, FIRSTHARMF, MANNEROFCO, WEATHER, LIGHTCONDI),
+df <- df |> mutate(across(c(RELATIONTO, TDOTLOC, TYPEOFCRAS, FIRSTHARMF, MANNEROFCO, WEATHER, LIGHTCONDI),
                           as.factor))
 
 df$DATEOFCRAS <- as.Date(df$DATEOFCRAS, format = "%m/%d/%Y")
 
 
 # Drop unneeded columns (same value for all instances/useless data)
-df <- df |> dplyr::select(-Shape..,
+df <- df |> select(-Shape..,
                    -MSLINK, -RELATIONT2, -URBAN, -NBR_TENN_C,
                    -NBR_RT2, -SPCL_CSE, -CNTY_SEQ, -YEAROFCRAS,
                    -LOCATE_TYP, -Hour)
@@ -34,7 +34,7 @@ set.seed(123)
 
 # With the help of Mr. C
 df <- df |> rowwise() |> mutate(RELATIONTO = case_when(
-  is.na(RELATIONTO) & TDOTLOC == "At an Intersection" ~ sample(c("INTERSECTION RELATED", "INTERSECTION"), 1),
+  is.na(RELATIONTO) & TDOTLOC == "At an Intersection" ~ sample(c("INTERSECTION RELATED", "INTERSECTION"), 1, replace = TRUE),
   is.na(RELATIONTO) & TDOTLOC == "Along Roadway" ~ sample(na.omit(unique(df$RELATIONTO)), 1, replace = TRUE),
   TRUE ~ as.character(RELATIONTO)
 )) |> ungroup() |> mutate(RELATIONTO = factor(RELATIONTO))
@@ -42,12 +42,15 @@ df <- df |> rowwise() |> mutate(RELATIONTO = case_when(
 df <- df |> hotdeck(variable = c("FIRSTHARMF", "MANNEROFCO", "WEATHER", "LIGHTCONDI"), imp_var = FALSE)
 
 # Drop the TDOTLOC feature (duplicates values of RELATIONTO)
-df <- df |> dplyr::select(-TDOTLOC)
+df <- df |> select(-TDOTLOC)
 
-# Enrichment
+# Enrichments
 # Derive a new attribute crashSeverity from TYPEOFCRAS
 df$crashSeverity <- as.factor(ifelse(df$TYPEOFCRAS %in% c("Prop Damage (over)", "Prop Damage (under)"), "Property Damage",
                                      ifelse(df$TYPEOFCRAS == "Suspected Minor Injury", "Minor Injury",
-                                            ifelse(df$TYPEOFCRAS == "Suspected Serious Injury", "Serious Injury", "Fatal"))
+                                            ifelse(df$TYPEOFCRAS == "Suspected Serious Injury", "Serious/Fatal", "Serious/Fatal"))
                                      )
                               )
+
+# Drop the TYPEOFCRAS feature
+df <- df |> select(-TYPEOFCRAS)

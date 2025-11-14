@@ -6,7 +6,7 @@ set.seed(123)
 crashes <- df |> select(-ID_NUMBER, -BLM, -CASENO, -DATEOFCRAS, -TIMEO)
 
 # Prevent data leakage
-crashes <- crashes |> select(-TYPEOFCRAS, -TOTALKIL, -TOTALINJU, -TOTAL_INCA, -TOTAL_OTHE)
+crashes <- crashes |> select(-TOTALKIL, -TOTALINJU, -TOTAL_INCA, -TOTAL_OTHE)
 
 # Split training and test sets
 split <- initial_split(crashes, prop = 0.80)

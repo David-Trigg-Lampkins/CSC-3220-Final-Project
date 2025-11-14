@@ -2,6 +2,11 @@ library(dplyr, ggplot2)
 
 theme_update(legend.position = "bottom")
 
+# Begin log mile (BLM)
+df |> ggplot(aes(x=BLM, fill=crashSeverity)) + 
+  geom_histogram(binwidth = 1) +
+  facet_grid(crashSeverity ~ .)
+
 # Bar chart of relation to
 df |> ggplot(aes(y=RELATIONTO, fill=RELATIONTO)) +
   geom_bar()
