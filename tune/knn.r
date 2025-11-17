@@ -24,12 +24,14 @@ kNNGrid
 
 kNNTuneWf <- workflow() |>
   add_model(kNNTuneSpec) |>
-  add_formula(crashSeverity ~ .)
+  add_recipe(crashRecipe)
 
 kNNRes <- kNNTuneWf |>
   tune_grid(
     resamples = folds,
-    grid = kNNGrid
+    grid = kNNGrid,
+    metrics = evalMetrics,
+    control = controlResamples
   )
 
 kNNRes
