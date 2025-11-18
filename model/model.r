@@ -1,3 +1,6 @@
+# The file clean.r must be run first
+# Every other file in the folder must be run after this file
+
 library(tidymodels, vip)
 library(kknn)
 library(randomForest)
@@ -84,7 +87,7 @@ testPredRf |>
   conf_mat(crashSeverity, .pred_class) |>
   autoplot(type = "heatmap")
 
-# Training with 10-fold cross-validation 
+# Training with 10-fold cross-validation
 folds <- vfold_cv(trainData, v = 10)
 folds
 
@@ -99,48 +102,3 @@ crashesFitCV <-
 crashesFitCV
 
 print(collect_metrics(crashesFitCV))
-
-# Oviya
-# Ensure crashSeverity is a factor for classification metrics
-trainData <- trainData |> mutate(crashSeverity = as.factor(crashSeverity))  
-testData  <- testData  |> mutate(crashSeverity = as.factor(crashSeverity))   
-
-# 10-fold stratified CV (stratify on crashSeverity)
-rf_folds <- vfold_cv(trainData, v = 10, strata = crashSeverity)             # NEW
-
-# Metrics to compute (trimmed to accuracy + F1)
-rf_metrics <- metric_set(accuracy, f_meas)                                   
-
-# Run resampling on the rf workflow (save_pred=TRUE to inspect predictions)
-rf_res <- crashClassWflow2 |>
-  fit_resamples(
-    resamples = rf_folds,
-    metrics   = rf_metrics,
-    control   = control_resamples(save_pred = TRUE, verbose = TRUE)
-  )                                                                         
-
-# Summary of CV metrics (mean, std_err, etc.)
-cv_metrics_rf <- collect_metrics(rf_res)                                    
-print(cv_metrics_rf)                                                        
-
-# Collect all fold-level predictions 
-cv_preds_rf <- collect_predictions(rf_res)                                  
-
-# Quick peek at CV predictions
-dplyr::glimpse(cv_preds_rf)                                                  
-head(cv_preds_rf)
-
-# Ryan
-# plain decision tree with cross validation
-
-# define the decision tree model specification. use rpart as engine for model
-treeModel <- decision_tree(mode = "classification", engine = "rpart")
-
-# create the workflow by bundling crashRecipe and treeModel
-treeWorkflow <- workflow() |> add_recipe(crashRecipe) |> add_model(treeModel)
-
-# fit the model with cross-validation folds
-treeFitCV <- treeWorkflow |> fit_resamples(folds)
-
-# 4. view metrics from the model
-print(collect_metrics(treeFitCV))
