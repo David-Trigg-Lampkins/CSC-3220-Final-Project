@@ -1,3 +1,37 @@
+# Random forest
+rfModel <- rand_forest(mode = "classification",
+                       engine = "randomForest",
+                       mtry = 3,
+                       min_n = 10)
+
+# Workflow for rf
+crashClassWflow2 <- workflow() |>
+  add_recipe(crashRecipe) |>
+  add_model(rfModel)
+
+rfModelFit <- crashClassWflow2 |>
+  fit(data = trainData)
+
+rfModelFit
+
+# Variable importance table
+#rfModelFit |>
+# extract_fit_parsnip() |>
+#  vi()
+
+testPredRf <- augment(rfModelFit, testData)
+
+testPredRf |> metrics(crashSeverity, .pred_class)
+
+# Macro averaged multiclass precision/recall
+testPredRf |> precision(crashSeverity, .pred_class)
+testPredRf |> recall(crashSeverity, .pred_class)
+
+testPredRf |> conf_mat(truth=crashSeverity, estimate=.pred_class)
+testPredRf |>
+  conf_mat(crashSeverity, .pred_class) |>
+  autoplot(type = "heatmap")
+
 # Oviya
 # Ensure crashSeverity is a factor for classification metrics
 trainData <- trainData |> mutate(crashSeverity = as.factor(crashSeverity))
