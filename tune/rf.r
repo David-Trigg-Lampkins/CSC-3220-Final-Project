@@ -35,7 +35,9 @@ treeTuneWf <- workflow() |>
 treeRes <- treeTuneWf |>
   tune_grid(
     resamples = folds,
-    grid = treeGrid
+    grid = treeGrid,
+    metrics = evalMetrics,
+    control = controlResamples
   )
 
 treeRes
@@ -53,7 +55,7 @@ treeRes |>
   scale_color_viridis_d(option = "plasma", begin = .9, end = 0)
 
 # Select the best based on a specific metric
-bestRf <- treeRes |> select_best(metric = "accuracy")
+bestRf <- treeRes |> select_best(metric = "recall")
 
 bestRf
 
@@ -63,7 +65,7 @@ finalRfWf <- treeTuneWf |>
 
 # Finalize fit
 finalRfFit <- finalRfWf |>
-  last_fit(split)
+  last_fit(split, metrics = evalMetrics)
 
 # Prevent parallel processing
 plan(sequential)

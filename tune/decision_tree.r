@@ -33,7 +33,9 @@ treeTuneWf <- workflow() |>
 treeRes <- treeTuneWf |>
   tune_grid(
     resamples = folds,
-    grid = treeGrid
+    grid = treeGrid,
+    metrics = evalMetrics,
+    control = controlResamples
   )
 
 treeRes
@@ -51,7 +53,7 @@ treeRes |>
   scale_color_viridis_d(option = "plasma", begin = .9, end = 0)
 
 # Select the best based on a specific metric
-bestTree <- treeRes |> select_best(metric = "accuracy")
+bestTree <- treeRes |> select_best(metric = "recall")
 
 bestTree
 
@@ -61,7 +63,7 @@ finalTreeWf <- treeTuneWf |>
 
 # Finalize fit
 finalTreeFit <- finalTreeWf |>
-  last_fit(split)
+  last_fit(split, metrics = evalMetrics)
 
 finalTreeFit |> collect_metrics()
 

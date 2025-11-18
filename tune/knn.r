@@ -49,7 +49,7 @@ kNNRes |>
   scale_color_viridis_d(option = "plasma", begin = .9, end = 0)
 
 # Select the best based on a specific metric
-bestKNN <- kNNRes |> select_best(metric = "accuracy")
+bestKNN <- kNNRes |> select_best(metric = "recall")
 
 bestKNN
 
@@ -59,7 +59,7 @@ finalKNNWf <- kNNTuneWf |>
 
 # Finalize fit
 finalKNNFit <- finalKNNWf |>
-  last_fit(split)
+  last_fit(split, metrics = evalMetrics)
 
 finalKNNFit |> collect_metrics()
 
