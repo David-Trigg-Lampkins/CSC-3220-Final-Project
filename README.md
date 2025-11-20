@@ -44,16 +44,17 @@ There are other models that exist that seek to classify crash severity based on 
     6. (cross-validation is not necessary for this class)
    
   ANSWERS:
-    We first preprocessed the data by noramlizing it and slecting the features we wanted. We also made sure to not involve any variable like TOTALKIL to make sure it wouldn't skew the model. We used different classification algorithms like the null model, kNN, decision tree, random forest, and SVM (linear, RBF, and polynomial). We trained and split the data with 123 seed, did 10-fold cross-validation, stratified the sampling, and used different metrics (accuracy, precision, recall, F1, and confusion matrix).
+  
+  We first preprocessed the data by noramlizing it and slecting the features we wanted. We also made sure to not involve any variable like TOTALKIL to make sure it wouldn't skew the model. We used different classification algorithms like the null model, kNN, decision tree, random forest, and SVM (linear, RBF, and polynomial). We trained and split the data with 123 seed, did 10-fold cross-validation, stratified the sampling, and used different metrics (accuracy, precision, recall, F1, and confusion matrix).
     
-    We used the null model as a base performance. The kNN was used cause the crash severity had patterns with similar conditions, and kNN can handle this. Decision trees are able to predict the outcome, so we could get some "human" decision-making approach. The random forest is there to balance out the decision tree in case it tries to overfit the data. This gets the interactions that single decision trees might miss. The linear SVM was used as a base. The RBF identifies any non-linear relationships between crash conditions and the severity of the crash. The polynomial captures any interactions between features.
+  We used the null model as a base performance. The kNN was used cause the crash severity had patterns with similar conditions, and kNN can handle this. Decision trees are able to predict the outcome, so we could get some "human" decision-making approach. The random forest is there to balance out the decision tree in case it tries to overfit the data. This gets the interactions that single decision trees might miss. The linear SVM was used as a base. The RBF identifies any non-linear relationships between crash conditions and the severity of the crash. The polynomial captures any interactions between features.
     
-    Things we did not use are neural networks.
+  Things we did not use are neural networks.
 
 
 ## 4. Tools (10%) 
   Steps:
-    1. [Describe the tools that you used and the reasons for their choice.
+    1. Describe the tools that you used and the reasons for their choice.
     2. Justify them in terms of the problem itself and the methods you want to use.
     3. Tools will probably include machine learning, and possibly data wrangling and visualization.
     4. Please discuss all of them.
@@ -62,6 +63,16 @@ There are other models that exist that seek to classify crash severity based on 
     7. What could be improved?
     8. Describe any tools that you tried and ended up not using.
     9. What was the problem?
+
+ANSWERS:
+The tools that are all listed below. We used machine learning to help us connect how the different conditions could affect the crash severity. The data wrangling was used so that only the necessary components were used in the crash recipe, and no outside noise would skew the data. The data visualization was used to create easy to understand visuals so we could see how the crash severity is being affected. We deployed the project in R. 
+     1. Tidymodels (to have the same framework)
+     2. Machine learning: kNN to make distance-based classification, random forest to combine multiple decision trees, support vector machine to find optimal decision boundaries.
+     3. Data wrangling: dplyr to manipulate data and crash recipe from the tidymodels to make sure everything is being preprocessed correctly.
+     4. Data visualization: ggplot2 to create nice visuals to gain information clearly, autoplot from tidymodels to automatically plot the model objects, scaling, and colors to make them more legible and understandable.
+     5. Evaluation: confusion matrix to show the actual and predicted classification for the severities, different classification metrics (accuracy, precision, etc.), and ROC to visualize the true positive and false positive.
+
+ 
 
 ## 5. Results (35%) 
   Steps:
