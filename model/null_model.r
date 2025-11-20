@@ -6,7 +6,7 @@ library(dplyr, tidymodels)
 set.seed(123)
 
 # Help prevent confounders (such as traffic volume)
-crashes <- df |> select(-ID_NUMBER, -BLM, -CASENO, -DATEOFCRAS, -TIMEO)
+crashes <- df |> select(-ID_NUMBER, -CASENO, -DATEOFCRAS, -TIMEO)
 
 # Prevent data leakage
 crashes <- crashes |> select(-TOTALKIL, -TOTALINJU, -TOTAL_INCA, -TOTAL_OTHE)

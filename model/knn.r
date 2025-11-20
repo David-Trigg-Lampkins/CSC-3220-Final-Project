@@ -1,7 +1,7 @@
 # Trey
 
 # Create kNN model
-kNN <- nearest_neighbor(mode="classification", neighbors=5)
+kNN <- nearest_neighbor(mode="classification", neighbors=7, engine = "kknn")
 
 # Workflow for kNN
 crashClassWflow1 <- workflow() |>
@@ -28,7 +28,7 @@ crashesWorkflow <- workflow() |>
 
 crashesFitCV <-
   crashesWorkflow |>
-  fit_resamples(folds, evalMetrics, controlResamples)
+  fit_resamples(resamples = folds, metrics = evalMetrics, control = controlResamples)
 
 crashesFitCV
 

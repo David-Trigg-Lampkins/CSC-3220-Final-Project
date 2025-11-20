@@ -19,7 +19,7 @@ RbfWflow <- workflow() |>
   add_model(rbfSVM)
 rbfSVMFit <- fit(RbfWflow, trainData)
 testPred <- augment(rbfSVMFit, testData)
-testPred |> accuracy(crashSeverity, .pred_class)
+testPred |> recall(crashSeverity, .pred_class)
 testPred |> conf_mat(crashSeverity, .pred_class)
 testPred |>
   conf_mat(crashSeverity, .pred_class) |>
@@ -33,7 +33,7 @@ PolyWflow <- workflow() |>
   add_model(polySVM)
 polySVMFit <- fit(RbfWflow, trainData)
 testPred <- augment(polySVMFit, testData)
-testPred |> accuracy(crashSeverity, .pred_class)
+testPred |> recall(crashSeverity, .pred_class)
 testPred |> conf_mat(crashSeverity, .pred_class)
 testPred |>
   conf_mat(crashSeverity, .pred_class) |>

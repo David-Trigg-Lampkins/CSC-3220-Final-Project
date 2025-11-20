@@ -8,7 +8,7 @@ treeModel <- decision_tree(mode = "classification", engine = "rpart")
 treeWorkflow <- workflow() |> add_recipe(crashRecipe) |> add_model(treeModel)
 
 # fit the model with cross-validation folds
-treeFitCV <- treeWorkflow |> fit_resamples(folds)
+treeFitCV <- treeWorkflow |> fit_resamples(resamples = folds, metrics = evalMetrics, control = controlResamples)
 
 # 4. view metrics from the model
 print(collect_metrics(treeFitCV))

@@ -47,8 +47,8 @@ rf_metrics <- metric_set(accuracy, f_meas)
 rf_res <- crashClassWflow2 |>
   fit_resamples(
     resamples = rf_folds,
-    metrics   = rf_metrics,
-    control   = control_resamples(save_pred = TRUE, verbose = TRUE)
+    metrics   = evalMetrics,
+    control   = controlResamples
   )
 
 # Summary of CV metrics (mean, std_err, etc.)

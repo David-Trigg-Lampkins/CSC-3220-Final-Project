@@ -7,8 +7,12 @@ library(randomForest)
 
 set.seed(123)
 
+# Functions used across multiple files
+evalMetrics <- metric_set(accuracy, recall, f_meas)
+controlResamples <- control_resamples(save_pred = TRUE, verbose = TRUE)
+
 # Help prevent confounders (such as traffic volume)
-crashes <- df |> select(-ID_NUMBER, -BLM, -CASENO, -DATEOFCRAS, -TIMEO)
+crashes <- df |> select(-ID_NUMBER, -CASENO, -DATEOFCRAS, -TIMEO)
 
 # Prevent data leakage
 crashes <- crashes |> select(-TOTALKIL, -TOTALINJU, -TOTAL_INCA, -TOTAL_OTHE)
@@ -30,5 +34,5 @@ crashRecipe <- recipe(crashSeverity ~ .,
   step_dummy(all_nominal_predictors())
 
 # Training with 10-fold cross-validation
-folds <- vfold_cv(trainData, v = 10)
+folds <- vfold_cv(trainData, v = 10, strata = crashSeverity)
 folds
