@@ -66,6 +66,7 @@ There are other models that exist that seek to classify crash severity based on 
 
 ANSWERS:
 The tools that are all listed below. We used machine learning to help us connect how the different conditions could affect the crash severity. The data wrangling was used so that only the necessary components were used in the crash recipe, and no outside noise would skew the data. The data visualization was used to create easy to understand visuals so we could see how the crash severity is being affected. We deployed the project in R. 
+
      1. Tidymodels (to have the same framework)
      2. Machine learning: kNN to make distance-based classification, random forest to combine multiple decision trees, support vector machine to find optimal decision boundaries.
      3. Data wrangling: dplyr to manipulate data and crash recipe from the tidymodels to make sure everything is being preprocessed correctly.
