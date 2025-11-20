@@ -47,11 +47,10 @@ treeTuneMetrics <- treeRes |> collect_metrics()
 treeRes |>
   collect_metrics() |>
   mutate(tree_depth = factor(tree_depth)) |>
-  ggplot(aes(min_n, mean, color = tree_depth)) +
+  ggplot(aes(tree_depth, mean, color = tree_depth)) +
   geom_line(linwidth = 1.5, alpha = 0.6) +
   geom_point(size = 2) +
   facet_wrap(~ .metric, scales = "free", nrow = 2) +
-  scale_x_log10(labels = scales::label_number()) +
   scale_color_viridis_d(option = "plasma", begin = .9, end = 0)
 
 # Select the best based on a specific metric
