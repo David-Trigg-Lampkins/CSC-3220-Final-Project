@@ -45,11 +45,10 @@ kNNRes |>
   geom_line(linewidth = 1.5, alpha = 0.6) +
   geom_point(size = 2) +
   facet_wrap(~ .metric, scales = "free", nrow = 2) +
-  scale_x_log10(labels = scales::label_number()) +
   scale_color_viridis_d(option = "plasma", begin = .9, end = 0)
 
 # Select the best based on a specific metric
-bestKNN <- kNNRes |> select_best(metric = "recall")
+bestKNN <- kNNRes |>  select_by_one_std_err(metric = "recall", desc = FALSE)
 
 bestKNN
 
@@ -75,8 +74,7 @@ finalKNN
 
 # Plot kNN
 finalKNN |>
-  extract_fit_engine() |>
-  rpart.plot(roundint = FALSE)
+  extract_fit_engine()
 
 # Find variable importance
 finalKNN |>
