@@ -1,4 +1,5 @@
-library(dplyr, ggplot2)
+library(dplyr)
+library(ggplot2)
 
 theme_update(legend.position = "bottom")
 

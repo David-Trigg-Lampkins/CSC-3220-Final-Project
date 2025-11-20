@@ -1,4 +1,5 @@
-library(tidyr, dplyr)
+library(tidyr)
+library(dplyr)
 library(VIM)
 
 df <- read.csv("raw_data.csv")
