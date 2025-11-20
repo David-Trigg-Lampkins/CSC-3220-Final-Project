@@ -42,6 +42,14 @@ There are other models that exist that seek to classify crash severity based on 
     4. In particular, be sure to include every method you tried, even if it eventually does not "work".
     5. When describing methods that didn't work, make clear how they failed and any evaluation metrics you used to decide so.]
     6. (cross-validation is not necessary for this class)
+   
+  ANSWERS:
+    We first preprocessed the data by noramlizing it and slecting the features we wanted. We also made sure to not involve any variable like TOTALKIL to make sure it wouldn't skew the model. We used different classification algorithms like the null model, kNN, decision tree, random forest, and SVM (linear, RBF, and polynomial). We trained and split the data with 123 seed, did 10-fold cross-validation, stratified the sampling, and used different metrics (accuracy, precision, recall, F1, and confusion matrix).
+    
+    We used the null model as a base performance. The kNN was used cause the crash severity had patterns with similar conditions, and kNN can handle this. Decision trees are able to predict the outcome, so we could get some "human" decision-making approach. The random forest is there to balance out the decision tree in case it tries to overfit the data. This gets the interactions that single decision trees might miss. The linear SVM was used as a base. The RBF identifies any non-linear relationships between crash conditions and the severity of the crash. The polynomial captures any interactions between features.
+    
+    Things we did not use are neural networks.
+
 
 ## 4. Tools (10%) 
   Steps:
