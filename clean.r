@@ -1,4 +1,5 @@
-library(tidyr, dplyr, VIM)
+library(tidyr, dplyr)
+library(VIM)
 
 df <- read.csv("raw_data.csv")
 
@@ -47,9 +48,8 @@ df <- df |> select(-TDOTLOC)
 # Enrichments
 # Derive a new attribute crashSeverity from TYPEOFCRAS
 df$crashSeverity <- as.factor(ifelse(df$TYPEOFCRAS %in% c("Prop Damage (over)", "Prop Damage (under)"), "Property Damage",
-                                     ifelse(df$TYPEOFCRAS == "Suspected Minor Injury", "Minor Injury",
-                                            ifelse(df$TYPEOFCRAS == "Suspected Serious Injury", "Serious/Fatal", "Serious/Fatal"))
-                                     )
+                                     "Injury"
+                                )
                               )
 
 # Drop the TYPEOFCRAS feature
