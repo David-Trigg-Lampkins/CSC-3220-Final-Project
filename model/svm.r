@@ -1,5 +1,4 @@
 # Trigg
-install.packages("kernlab")
 library(kernlab)
 library(tidymodels)
 #linear
@@ -38,3 +37,9 @@ testPred |> conf_mat(crashSeverity, .pred_class)
 testPred |>
   conf_mat(crashSeverity, .pred_class) |>
   autoplot(type = "heatmap")
+
+# Fit the model with cross-validation folds
+svmFitCV <- linearworkflow |> fit_resamples(resamples = folds, metrics = evalMetrics, control = controlResamples)
+
+# View metrics from the model
+print(collect_metrics(svmFitCV))
