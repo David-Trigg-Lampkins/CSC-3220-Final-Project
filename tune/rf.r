@@ -6,7 +6,7 @@ library(rpart.plot)
 library(vip)
 library(future)
 
-set.seed(123)
+set.seed(67)
 
 # Go quick with parallelism
 plan(multisession, workers = parallel::detectCores() - 1)

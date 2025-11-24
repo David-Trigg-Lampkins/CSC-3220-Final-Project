@@ -4,7 +4,7 @@
 library(tidymodels, dplyr)
 library(kernlab)
 
-set.seed(123)
+set.seed(67)
 
 # Go quick with parallelism
 plan(multisession, workers = parallel::detectCores() - 1)

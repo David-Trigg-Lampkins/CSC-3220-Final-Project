@@ -3,7 +3,7 @@
 
 library(dplyr, tidymodels)
 
-set.seed(123)
+set.seed(67)
 
 # Help prevent confounders (such as traffic volume)
 crashes <- df |> select(-ID_NUMBER, -CASENO, -DATEOFCRAS, -TIMEO)

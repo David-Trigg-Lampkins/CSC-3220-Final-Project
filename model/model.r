@@ -6,7 +6,7 @@ library(vip)
 library(kknn)
 library(randomForest)
 
-set.seed(123)
+set.seed(67)
 
 # Functions used across multiple files
 evalMetrics <- metric_set(accuracy, recall, f_meas)

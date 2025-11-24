@@ -3,7 +3,7 @@
 library(tidymodels, dplyr)
 library(rpart.plot, vip)
 
-set.seed(123)
+set.seed(67)
 
 treeTuneSpec <-
   decision_tree(
