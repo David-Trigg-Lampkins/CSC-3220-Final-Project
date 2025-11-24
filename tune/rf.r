@@ -1,7 +1,9 @@
 # This file needs model.r to be run first
 
-library(tidymodels, dplyr)
-library(rpart.plot, vip)
+library(tidymodels)
+library(dplyr)
+library(rpart.plot)
+library(vip)
 library(future)
 
 set.seed(123)

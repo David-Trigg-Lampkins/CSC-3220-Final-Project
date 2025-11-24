@@ -1,7 +1,8 @@
 # The file clean.r must be run first
 # Every other file in the folder must be run after this file
 
-library(tidymodels, vip)
+library(tidymodels)
+library(vip)
 library(kknn)
 library(randomForest)
 
