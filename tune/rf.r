@@ -56,7 +56,7 @@ treeRes |>
   scale_color_viridis_d(option = "plasma", begin = .9, end = 0)
 
 # Select the best based on a specific metric
-bestRf <- treeRes |> select_best(metric = "recall")
+bestRf <- treeRes |> select_best(metric = "f_meas")
 
 bestRf
 

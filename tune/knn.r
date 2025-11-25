@@ -2,8 +2,12 @@
 
 library(tidymodels, dplyr)
 library(rpart.plot, vip)
+library(future)
 
 set.seed(67)
+
+# Go quick with parallelism
+plan(multisession, workers = parallel::detectCores() - 1)
 
 kNNTuneSpec <-
   nearest_neighbor(
@@ -48,7 +52,7 @@ kNNRes |>
   scale_color_viridis_d(option = "plasma", begin = .9, end = 0)
 
 # Select the best based on a specific metric
-bestKNN <- kNNRes |>  select_by_one_std_err(metric = "recall", desc = FALSE)
+bestKNN <- kNNRes |>  select_best(metric = "f_meas")
 
 bestKNN
 
@@ -59,6 +63,9 @@ finalKNNWf <- kNNTuneWf |>
 # Finalize fit
 finalKNNFit <- finalKNNWf |>
   last_fit(split, metrics = evalMetrics)
+
+# Prevent parallel processing
+plan(sequential)
 
 finalKNNFit |> collect_metrics()
 

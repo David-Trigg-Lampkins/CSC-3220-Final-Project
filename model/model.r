@@ -1,4 +1,4 @@
-# The file clean.r must be run first
+# The file clean.r and null_model.r must be run first
 # Every other file in the folder must be run after this file
 
 library(tidymodels)
@@ -8,20 +8,10 @@ library(randomForest)
 
 set.seed(67)
 
-# Functions used across multiple files
-evalMetrics <- metric_set(accuracy, recall, f_meas)
-controlResamples <- control_resamples(save_pred = TRUE, verbose = TRUE)
-
-# Help prevent confounders (such as traffic volume)
-crashes <- df |> select(-ID_NUMBER, -CASENO, -DATEOFCRAS, -TIMEO)
-
-# Prevent data leakage
-crashes <- crashes |> select(-TOTALKIL, -TOTALINJU, -TOTAL_INCA, -TOTAL_OTHE)
+# Remember to run null_model.r first since it contains reused functions
 
 # Split training and test sets
-split <- initial_split(crashes, prop = 0.80)
-trainData <- training(split)
-testData <- testing(split)
+# Moved to null_model.r to ensure same data sets
 
 # Convert to dummy variables
 # There are different methods of doing this in base R vs libraries

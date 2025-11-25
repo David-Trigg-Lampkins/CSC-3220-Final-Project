@@ -3,6 +3,7 @@
 
 library(tidymodels, dplyr)
 library(kernlab)
+library(future)
 
 set.seed(67)
 
