@@ -1,87 +1,95 @@
-# This file needs model.r to be run first
+# Load necessary libraries
+library(tidymodels)
+library(rpart)
+library(rpart.plot)
+library(vip)
 
-library(tidymodels, dplyr)
-library(rpart.plot, vip)
-
-set.seed(123)
-
-treeTuneSpec <-
-  decision_tree(
-    #cost_complexity = tune(),
-    tree_depth = tune(),
-    min_n = tune()
-  ) |>
+# ---------------------------------------------------------
+# 1. Define the Model with Hyperparameters to Tune
+# ---------------------------------------------------------
+# We enable tuning for cost_complexity, tree_depth, and min_n
+tree_spec <- decision_tree(
+  cost_complexity = tune(),
+  tree_depth = tune(),
+  min_n = tune()
+) |>
   set_engine("rpart") |>
   set_mode("classification")
 
-treeTuneSpec
-
-# Resample and select 5 different possible values for hyperparameters
-treeGrid <- grid_regular(
-  #cost_complexity(),
+# ---------------------------------------------------------
+# 2. Define the Grid
+# ---------------------------------------------------------
+# Create a grid of values to try for the hyperparameters
+tree_grid <- grid_regular(
+  cost_complexity(),
   tree_depth(),
   min_n(),
   levels = 5
 )
 
-treeGrid
+# ---------------------------------------------------------
+# 3. Create the Workflow
+# ---------------------------------------------------------
+# Combine the recipe from File 1 with the tunable model
+tree_workflow <- workflow() |>
+  add_recipe(crashRecipe) |>
+  add_model(tree_spec)
 
-treeTuneWf <- workflow() |>
-  add_model(treeTuneSpec) |>
-  add_formula(crashSeverity ~ .)
+# ---------------------------------------------------------
+# 4. Run the Tuning
+# ---------------------------------------------------------
+# Use parallel processing to speed it up if available
+doParallel::registerDoParallel()
 
-treeRes <- treeTuneWf |>
+tree_res <- tree_workflow |>
   tune_grid(
     resamples = folds,
-    grid = treeGrid,
+    grid = tree_grid,
     metrics = evalMetrics,
     control = controlResamples
   )
 
-treeRes
+# ---------------------------------------------------------
+# 5. Evaluate and Select Best Model
+# ---------------------------------------------------------
+# View the results of the tuning
+tree_res |> collect_metrics()
 
-treeTuneMetrics <- treeRes |> collect_metrics()
+# Plot the performance profiles
+tree_res |> autoplot()
 
-treeRes |>
-  collect_metrics() |>
-  mutate(tree_depth = factor(tree_depth)) |>
-  ggplot(aes(tree_depth, mean, color = tree_depth)) +
-  geom_line(linwidth = 1.5, alpha = 0.6) +
-  geom_point(size = 2) +
-  facet_wrap(~ .metric, scales = "free", nrow = 2) +
-  scale_color_viridis_d(option = "plasma", begin = .9, end = 0)
+# Select the best set of hyperparameters based on a metric (e.g., roc_auc or recall)
+# Change "roc_auc" to "recall" or "accuracy" if that is your primary metric
+best_tree <- tree_res |> select_best(metric = "recall")
 
-# Select the best based on a specific metric
-bestTree <- treeRes |> select_best(metric = "recall")
+print(best_tree)
 
-bestTree
+# ---------------------------------------------------------
+# 6. Finalize and Fit
+# ---------------------------------------------------------
+# Update the workflow with the best hyperparameters
+final_tree_workflow <- tree_workflow |>
+  finalize_workflow(best_tree)
 
-# Finalize model
-finalTreeWf <- treeTuneWf |>
-  finalize_workflow(bestTree)
-
-# Finalize fit
-finalTreeFit <- finalTreeWf |>
+# Fit to the training set and evaluate on the test set (using the 'split' object)
+final_fit <- final_tree_workflow |>
   last_fit(split, metrics = evalMetrics)
 
-finalTreeFit |> collect_metrics()
+# View final metrics on the test set
+final_fit |> collect_metrics()
 
-finalTreeFit |>
-  collect_predictions() |>
-  roc_curve(crashSeverity, .pred_class) |>
-  autoplot()
+# ---------------------------------------------------------
+# 7. Visualization
+# ---------------------------------------------------------
+# Extract the final fitted model object for plotting
+final_tree_model <- extract_workflow(final_fit)
 
-# Extract workflow
-finalTree <- extract_workflow(finalTreeFit)
-
-finalTree
-
-# Plot decision tree
-finalTree |>
+# Plot the decision tree
+final_tree_model |>
   extract_fit_engine() |>
   rpart.plot(roundint = FALSE)
 
-# Find variable importance
-finalTree |>
+# Plot variable importance
+final_tree_model |>
   extract_fit_parsnip() |>
   vip()
