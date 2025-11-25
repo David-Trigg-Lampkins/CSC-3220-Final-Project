@@ -45,7 +45,7 @@ tree_res |> autoplot()
 
 # Select the best set of hyperparameters based on recall
 
-best_tree <- tree_res |> select_best(metric = "recall")
+best_tree <- tree_res |> select_best(metric = "roc_auc")
 
 print(best_tree)
 

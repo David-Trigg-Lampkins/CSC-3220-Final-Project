@@ -9,7 +9,7 @@ library(randomForest)
 set.seed(67)
 
 # Functions used across multiple files
-evalMetrics <- metric_set(accuracy, recall, f_meas)
+evalMetrics <- metric_set(accuracy, recall, f_meas, roc_auc)
 controlResamples <- control_resamples(save_pred = TRUE, verbose = TRUE)
 
 # Help prevent confounders (such as traffic volume)
