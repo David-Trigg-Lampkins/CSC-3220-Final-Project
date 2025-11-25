@@ -43,7 +43,7 @@ tree_res |> collect_metrics()
 # Plot the performance profiles
 tree_res |> autoplot()
 
-# Select the best set of hyperparameters based on recall
+# Select the best set of hyperparameters based on area under curve
 
 best_tree <- tree_res |> select_best(metric = "roc_auc")
 
