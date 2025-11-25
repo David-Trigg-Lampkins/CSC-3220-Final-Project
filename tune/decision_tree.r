@@ -4,21 +4,13 @@ library(rpart)
 library(rpart.plot)
 library(vip)
 
-# ---------------------------------------------------------
-# 1. Define the Model with Hyperparameters to Tune
-# ---------------------------------------------------------
 # We enable tuning for cost_complexity, tree_depth, and min_n
 tree_spec <- decision_tree(
   cost_complexity = tune(),
   tree_depth = tune(),
   min_n = tune()
 ) |>
-  set_engine("rpart") |>
-  set_mode("classification")
 
-# ---------------------------------------------------------
-# 2. Define the Grid
-# ---------------------------------------------------------
 # Create a grid of values to try for the hyperparameters
 tree_grid <- grid_regular(
   cost_complexity(),
@@ -27,17 +19,11 @@ tree_grid <- grid_regular(
   levels = 5
 )
 
-# ---------------------------------------------------------
-# 3. Create the Workflow
-# ---------------------------------------------------------
 # Combine the recipe from File 1 with the tunable model
 tree_workflow <- workflow() |>
   add_recipe(crashRecipe) |>
   add_model(tree_spec)
 
-# ---------------------------------------------------------
-# 4. Run the Tuning
-# ---------------------------------------------------------
 # Use parallel processing to speed it up if available
 doParallel::registerDoParallel()
 
@@ -49,24 +35,17 @@ tree_res <- tree_workflow |>
     control = controlResamples
   )
 
-# ---------------------------------------------------------
-# 5. Evaluate and Select Best Model
-# ---------------------------------------------------------
 # View the results of the tuning
 tree_res |> collect_metrics()
 
 # Plot the performance profiles
 tree_res |> autoplot()
 
-# Select the best set of hyperparameters based on a metric (e.g., roc_auc or recall)
-# Change "roc_auc" to "recall" or "accuracy" if that is your primary metric
+# Select the best set of hyperparameters based on recall
 best_tree <- tree_res |> select_best(metric = "recall")
 
 print(best_tree)
 
-# ---------------------------------------------------------
-# 6. Finalize and Fit
-# ---------------------------------------------------------
 # Update the workflow with the best hyperparameters
 final_tree_workflow <- tree_workflow |>
   finalize_workflow(best_tree)
@@ -78,9 +57,6 @@ final_fit <- final_tree_workflow |>
 # View final metrics on the test set
 final_fit |> collect_metrics()
 
-# ---------------------------------------------------------
-# 7. Visualization
-# ---------------------------------------------------------
 # Extract the final fitted model object for plotting
 final_tree_model <- extract_workflow(final_fit)
 
