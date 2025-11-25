@@ -9,7 +9,9 @@ tree_spec <- decision_tree(
   cost_complexity = tune(),
   tree_depth = tune(),
   min_n = tune()
-)
+) |>
+  set_engine("rpart") |>
+  set_mode("classification")
 
 # Create a grid of values to try for the hyperparameters
 tree_grid <- grid_regular(
@@ -42,6 +44,7 @@ tree_res |> collect_metrics()
 tree_res |> autoplot()
 
 # Select the best set of hyperparameters based on recall
+
 best_tree <- tree_res |> select_best(metric = "recall")
 
 print(best_tree)
