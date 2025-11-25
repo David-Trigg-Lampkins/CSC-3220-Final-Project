@@ -1,94 +1,148 @@
 # This file needs model.r to be run first
-
+# Oviya
 library(tidymodels)
-library(dplyr)
-library(rpart.plot)
+library(randomForest)
 library(vip)
-library(future)
+library(doParallel) 
+library(ggplot2)
 
 set.seed(67)
 
-# Go quick with parallelism
-plan(multisession, workers = parallel::detectCores() - 1)
+# Parallel processing
+# Detect number of cores and use all but one "exhaustive"
+all_cores <- parallel::detectCores(logical = FALSE)
+cl <- makePSOCKcluster(all_cores - 1)
+registerDoParallel(cl)
 
-treeTuneSpec <-
-  rand_forest(
-    trees = tune(),
-    min_n = tune()
-  ) |>
-  set_engine("randomForest") |>
-  set_mode("classification")
 
-treeTuneSpec
-
-# Resample and select 5 different possible values for hyperparameters
-treeGrid <- grid_regular(
-  trees(),
-  min_n(),
-  levels = 5
+# Mark hyperparameters for tuning 
+rf_tune_model <- rand_forest(
+  mode = "classification",
+  engine = "randomForest",
+  mtry = tune(), # Number of variables randomly sampled at each split
+  trees = tune(), # Number of trees in the forest
+  min_n = tune() # Minimum number of data points in a node for splitting
 )
 
-treeGrid
+# Workflow
+rf_tune_workflow <- workflow() |>
+  add_recipe(crashRecipe) |>
+  add_model(rf_tune_model)
 
-treeTuneWf <- workflow() |>
-  add_model(treeTuneSpec) |>
-  add_formula(crashSeverity ~ .)
+# Regular grid 
+rf_grid_regular <- grid_regular(
+  mtry(range = c(2, 8)),          
+  trees(range = c(100, 1000)),   
+  min_n(range = c(5, 30)),         
+  levels = 3                        
+)
 
-treeRes <- treeTuneWf |>
+print(rf_grid_regular)
+
+# Hyperparameter tuning
+chosen_grid <- rf_grid_regular  
+
+# Tune the model using cross-validation
+rf_tune_results <- rf_tune_workflow |>
   tune_grid(
-    resamples = folds,
-    grid = treeGrid,
-    metrics = evalMetrics,
-    control = controlResamples
+    resamples = folds,            
+    grid = chosen_grid, 
+    metrics = evalMetrics, 
+    control = control_grid(
+      save_pred = TRUE,
+      verbose = TRUE,
+      allow_par = TRUE # Enable parallel processing
+    )
   )
 
-treeRes
 
-treeTuneMetrics <- treeRes |> collect_metrics()
+# Tuning results
+show_best(rf_tune_results, metric = "accuracy", n = 10)
 
-treeRes |>
+show_best(rf_tune_results, metric = "f_meas", n = 10)
+
+show_best(rf_tune_results, metric = "recall", n = 10)
+
+# Select best model based on accuracy
+best_rf_params <- select_best(rf_tune_results, metric = "accuracy")
+print(best_rf_params)
+
+# Plot performance across different hyperparameters
+autoplot(rf_tune_results, metric = "accuracy") +
+  labs(title = "Random Forest Tuning Results - Accuracy",
+       subtitle = "Performance")
+
+autoplot(rf_tune_results, metric = "f_meas") +
+  labs(title = "Random Forest Tuning Results - F-Measure",
+       subtitle = "Performance")
+
+
+
+rf_tune_results |>
   collect_metrics() |>
-  mutate(tree_depth = factor(tree_depth)) |>
-  ggplot(aes(tree_depth, mean, color = tree_depth)) +
-  geom_line(linwidth = 1.5, alpha = 0.6) +
-  geom_point(size = 2) +
-  facet_wrap(~ .metric, scales = "free", nrow = 2) +
-  scale_color_viridis_d(option = "plasma", begin = .9, end = 0)
+  filter(.metric == "accuracy") |>
+  ggplot(aes(x = mtry, y = mean, color = factor(min_n))) +
+  geom_point(size = 3) +
+  geom_line(aes(group = interaction(min_n, trees))) +
+  facet_wrap(~ trees, labeller = label_both) +
+  labs(title = "Accuracy vs mtry",
+       x = "Number of Predictors",
+       y = "Mean Accuracy",
+       color = "Min Node Size") +
+  theme_minimal()
 
-# Select the best based on a specific metric
-bestRf <- treeRes |> select_best(metric = "recall")
+# Update workflow with best hyperparameters
+final_rf_workflow <- rf_tune_workflow |>
+  finalize_workflow(best_rf_params)
 
-bestRf
+print(final_rf_workflow)
 
-# Finalize model
-finalRfWf <- treeTuneWf |>
-  finalize_workflow(bestRf)
+# Final fit 
+final_rf_fit <- final_rf_workflow |>
+  fit(data = trainData)
 
-# Finalize fit
-finalRfFit <- finalRfWf |>
-  last_fit(split, metrics = evalMetrics)
+print(final_rf_fit)
 
-# Prevent parallel processing
-plan(sequential)
+# Make predictions on test data
+test_predictions <- augment(final_rf_fit, testData)
 
-finalRfFit |> collect_metrics()
+# Calculate test set metrics
+test_metrics <- test_predictions |>
+  metrics(truth = crashSeverity, estimate = .pred_class)
+print(test_metrics)
 
-finalRfFit |>
-  collect_predictions() |>
-  roc_curve(crashSeverity, .pred_class) |>
-  autoplot()
+# Detailed metrics
+print(test_predictions |> accuracy(crashSeverity, .pred_class))
 
-# Extract workflow
-finalRf <- extract_workflow(finalRfFit)
+print(test_predictions |> precision(crashSeverity, .pred_class))
 
-finalRf
+print(test_predictions |> recall(crashSeverity, .pred_class))
 
-# Plot decision tree
-finalRf |>
-  extract_fit_engine() |>
-  rpart.plot(roundint = FALSE)
+print(test_predictions |> f_meas(crashSeverity, .pred_class))
 
-# Find variable importance
-finalRf |>
+# Confusion matrix
+conf_mat_result <- test_predictions |>
+  conf_mat(truth = crashSeverity, estimate = .pred_class)
+print(conf_mat_result)
+
+# Visualize confusion matrix
+test_predictions |>
+  conf_mat(crashSeverity, .pred_class) |>
+  autoplot(type = "heatmap") +
+  labs(title = "Confusion Matrix",
+       subtitle = paste("Test Set Performance with Optimized Hyperparameters"))
+
+# Variable importance
+vip_data <- final_rf_fit |>
   extract_fit_parsnip() |>
-  vip()
+  vip(num_features = 15)
+
+print(vip_data)
+
+# Compare 
+print(best_rf_params)
+
+# Stop parallel processing cluster
+stopCluster(cl)
+registerDoSEQ()
+
