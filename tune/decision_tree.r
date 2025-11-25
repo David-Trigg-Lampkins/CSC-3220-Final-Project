@@ -9,7 +9,7 @@ tree_spec <- decision_tree(
   cost_complexity = tune(),
   tree_depth = tune(),
   min_n = tune()
-) |>
+)
 
 # Create a grid of values to try for the hyperparameters
 tree_grid <- grid_regular(
