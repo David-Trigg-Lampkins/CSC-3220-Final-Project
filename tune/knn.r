@@ -82,8 +82,3 @@ finalKNN
 # Plot kNN
 finalKNN |>
   extract_fit_engine()
-
-# Find variable importance
-finalKNN |>
-  extract_fit_parsnip() |>
-  vip()

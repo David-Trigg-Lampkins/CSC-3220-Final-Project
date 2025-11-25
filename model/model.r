@@ -8,7 +8,19 @@ library(randomForest)
 
 set.seed(67)
 
+<<<<<<< HEAD
 # Remember to run null_model.r first since it contains reused functions
+=======
+# Functions used across multiple files
+evalMetrics <- metric_set(accuracy, recall, f_meas, roc_auc)
+controlResamples <- control_resamples(save_pred = TRUE, verbose = TRUE)
+
+# Help prevent confounders (such as traffic volume)
+crashes <- df |> select(-ID_NUMBER, -CASENO, -DATEOFCRAS, -TIMEO)
+
+# Prevent data leakage
+crashes <- crashes |> select(-TOTALKIL, -TOTALINJU, -TOTAL_INCA, -TOTAL_OTHE)
+>>>>>>> bce174ec8d624a5c45c187da320c179309cd632a
 
 # Split training and test sets
 # Moved to null_model.r to ensure same data sets
