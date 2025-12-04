@@ -6,6 +6,7 @@ theme_update(legend.position = "bottom")
 # Begin log mile (BLM)
 df |> ggplot(aes(x=BLM, fill=crashSeverity)) + 
   geom_histogram(binwidth = 1) +
+  scale_fill_manual(values = c("Property Damage" = "blue", "Injury" = "maroon")) +
   facet_grid(crashSeverity ~ .)
 
 # Bar chart of relation to
@@ -15,11 +16,13 @@ df |> ggplot(aes(y=RELATIONTO, fill=RELATIONTO)) +
 # Histogram of date
 df |> ggplot(aes(x=DATEOFCRAS, fill=crashSeverity)) +
   geom_histogram() +
+  scale_fill_manual(values = c("Property Damage" = "blue", "Injury" = "maroon")) +
   facet_grid(crashSeverity ~ .)
 
 # Histogram of time
 df |> ggplot(aes(x=TIMEO, fill=crashSeverity)) +
   geom_histogram() +
+  scale_fill_manual(values = c("Property Damage" = "blue", "Injury" = "maroon")) +
   facet_grid(crashSeverity ~ .)
 
 # Box plots of numeric data
@@ -54,4 +57,5 @@ df |> ggplot(aes(y=LIGHTCONDI, fill=LIGHTCONDI)) +
 
 # Bar chart of crash severity
 df |> ggplot(aes(y=crashSeverity, fill=crashSeverity)) +
-  geom_bar()
+  geom_bar() +
+  scale_fill_manual(values = c("Property Damage" = "blue", Injury = "maroon"))
