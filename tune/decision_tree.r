@@ -45,12 +45,8 @@ tree_res |> autoplot()
 
 # Select the best set of hyperparameters based on area under curve
 
-<<<<<<< HEAD
 # Select the best based on a specific metric
-bestTree <- treeRes |> select_best(metric = "f_meas")
-=======
 best_tree <- tree_res |> select_best(metric = "roc_auc")
->>>>>>> bce174ec8d624a5c45c187da320c179309cd632a
 
 print(best_tree)
 

@@ -1,5 +1,3 @@
-# This file needs model.r to be run first
-# Oviya
 library(tidymodels)
 library(randomForest)
 library(vip)
@@ -95,14 +93,10 @@ rf_tune_results |>
 final_rf_workflow <- rf_tune_workflow |>
   finalize_workflow(best_rf_params)
 
-<<<<<<< HEAD
-# Select the best based on a specific metric
-bestRf <- treeRes |> select_best(metric = "f_meas")
-=======
 print(final_rf_workflow)
->>>>>>> bce174ec8d624a5c45c187da320c179309cd632a
 
 # Final fit 
+
 final_rf_fit <- final_rf_workflow |>
   fit(data = trainData)
 
@@ -138,6 +132,7 @@ test_predictions |>
        subtitle = paste("Test Set Performance with Optimized Hyperparameters"))
 
 # Variable importance
+
 vip_data <- final_rf_fit |>
   extract_fit_parsnip() |>
   vip(num_features = 15)
@@ -150,4 +145,3 @@ print(best_rf_params)
 # Stop parallel processing cluster
 stopCluster(cl)
 registerDoSEQ()
-
